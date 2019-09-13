@@ -48,20 +48,20 @@
     [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
 
     [application registerForRemoteNotifications];
-    
+
     // get GoogleService-Info.plist file path
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    
+
     // if file is successfully found, use it
     if(filePath){
         NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
         // create firebase configure options passing .plist as content
         FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        
+
         // configure FIRApp with options
         [FIRApp configureWithOptions:options];
     }
-    
+
     // no .plist found, try default App
     if (![FIRApp defaultApp] && !filePath) {
         NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
@@ -86,7 +86,9 @@
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     NSLog(@"Received APNS Token");
+    [FIRMessaging messaging].APNSToken = deviceToken;
     [[FIRMessaging messaging] setAPNSToken:deviceToken];
+    NSLog(@"deviceToken1 = %@", deviceToken);
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -122,11 +124,6 @@
             NSLog(@"InstanceID token: %@", refreshedToken);
         }
     }];
-}
-
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    [FIRMessaging messaging].APNSToken = deviceToken;
-    NSLog(@"deviceToken1 = %@", deviceToken);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
